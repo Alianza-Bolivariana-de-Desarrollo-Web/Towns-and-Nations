@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.leralix.tan.data.territory.Nation;
 import org.leralix.tan.data.territory.NationData;
-import org.leralix.tan.data.territory.Region;
+import org.leralix.tan.data.territory.Town;
 import org.leralix.tan.data.territory.cosmetic.ICustomIcon;
 import org.leralix.tan.storage.stored.NationStorage;
 import org.leralix.tan.storage.typeadapter.IconAdapter;
@@ -45,12 +45,14 @@ public class NationDataStorage extends JsonStorage<Nation> implements NationStor
     }
 
     @Override
-    public Nation newNation(String name, @NotNull Region capital) {
+    public Nation newNation(String name, Town capital) {
         String nationID = generateNextID();
-        NationData nationData = new NationData(nationID, name, capital.getLeaderData(), capital);
+        NationData nationData = new NationData(nationID, name, null, capital);
 
         put(nationID, nationData);
-        capital.setOverlord(nationData);
+        if (capital != null) {
+            capital.setOverlord(nationData);
+        }
 
         return nationData;
     }

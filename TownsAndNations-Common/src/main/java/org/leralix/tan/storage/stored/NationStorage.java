@@ -17,13 +17,13 @@ public interface NationStorage {
     }
 
     default Nation get(ITanPlayer playerData){
-        if(playerData == null){
+        if(playerData == null || !playerData.hasNation()){
             return null;
         }
-        return get(playerData.getRegion());
+        return get(playerData.getNationId());
     }
 
-    Nation newNation(String name, @NotNull Region capital);
+    Nation newNation(String name, Town capital);
 
     Nation get(String nationID);
 

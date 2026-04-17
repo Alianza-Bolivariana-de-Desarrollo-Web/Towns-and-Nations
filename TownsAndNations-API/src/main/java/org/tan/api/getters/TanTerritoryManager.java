@@ -1,7 +1,6 @@
 package org.tan.api.getters;
 
 import org.tan.api.interfaces.territory.TanNation;
-import org.tan.api.interfaces.territory.TanRegion;
 import org.tan.api.interfaces.territory.TanTown;
 
 import java.util.Collection;
@@ -9,8 +8,8 @@ import java.util.Optional;
 
 /**
  * The TanTerritoryManager interface provides methods for accessing and managing territories within the application.
- * It allows retrieval of towns and regions by their IDs or names, and provides collections of all towns and regions.
- * This interface is essential for handling territory-related operations and ensuring proper management of town and region data.
+ * It allows retrieval of towns and nations by their IDs or names, and provides collections of all towns and nations.
+ * This interface is essential for handling territory-related operations and ensuring proper management of town and nation data.
  */
 public interface TanTerritoryManager {
 
@@ -36,29 +35,6 @@ public interface TanTerritoryManager {
      * @return a {@link Collection} of all the towns
      */
     Collection<TanTown> getTowns();
-
-    /**
-     * Get a region by its ID
-     * @param regionID the ID of the region
-     * @return The region if it exists. {@link Optional#empty()} otherwise
-     */
-    Optional<TanRegion> getRegion(String regionID);
-
-    /**
-     * Get a region by its name
-     * <br>
-     * It is recommended to use the UUID instead of the name because
-     * names duplicate can happen if the option is enabled in the configuration
-     * @param regionName the name of the region
-     * @return  The region if it exists. {@link Optional#empty()} otherwise
-     */
-    Optional<TanRegion> getRegionByName(String regionName);
-
-    /**
-     * Get all the regions
-     * @return a {@link Collection} of all the regions
-     */
-    Collection<TanRegion> getRegions();
 
     /**
      * Get a nation by its ID

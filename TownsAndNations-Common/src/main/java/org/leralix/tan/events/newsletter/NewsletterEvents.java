@@ -48,16 +48,6 @@ public class NewsletterEvents implements TanListener {
     }
 
     @EventHandler
-    public void onRegionCreated(RegionCreatedEvent event) {
-        newsletterStorage.register(new RegionCreationNews(event.getRegion(), event.getExecutor()));
-    }
-
-    @EventHandler
-    public void onRegionDeleted(RegionDeletedEvent event) {
-        newsletterStorage.register(new RegionDeletedNews(event.getRegion(), event.getExecutor()));
-    }
-
-    @EventHandler
     public void onNationCreated(NationCreatedEvent event) {
         newsletterStorage.register(new NationCreationNews(event.getNation(), event.getExecutor()));
     }

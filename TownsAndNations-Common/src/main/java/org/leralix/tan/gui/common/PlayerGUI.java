@@ -5,7 +5,6 @@ import org.leralix.tan.TownsAndNations;
 import org.leralix.tan.data.building.landmark.Landmark;
 import org.leralix.tan.data.player.ITanPlayer;
 import org.leralix.tan.data.territory.Nation;
-import org.leralix.tan.data.territory.Region;
 import org.leralix.tan.data.territory.Town;
 import org.leralix.tan.gui.landmark.LandmarkNoOwnerMenu;
 import org.leralix.tan.gui.landmark.LandmarkOwnedMenu;
@@ -27,15 +26,6 @@ public class PlayerGUI {
             new NationMenu(player, nationData);
         } else {
             new NoNationMenu(player);
-        }
-    }
-
-    public static void dispatchPlayerRegion(Player player, ITanPlayer playerData) {
-        Region regionData = TownsAndNations.getPlugin().getRegionStorage().get(playerData);
-        if (regionData != null) {
-            new RegionMenu(player, regionData);
-        } else {
-            new NoRegionMenu(player);
         }
     }
 

@@ -22,9 +22,6 @@ public class TerritoryUtil {
         if(id.startsWith("T")) {
             return TownsAndNations.getPlugin().getTownStorage().get(id);
         }
-        if(id.startsWith("R")) {
-            return TownsAndNations.getPlugin().getRegionStorage().get(id);
-        }
         if (id.startsWith("N")) {
             return TownsAndNations.getPlugin().getNationStorage().get(id);
         }
@@ -46,8 +43,6 @@ public class TerritoryUtil {
 
         if(scope == BrowseScope.ALL || scope == BrowseScope.TOWNS)
             territoryList.addAll(TownsAndNations.getPlugin().getTownStorage().getAll().values());
-        if(scope == BrowseScope.ALL || scope == BrowseScope.REGIONS)
-            territoryList.addAll(TownsAndNations.getPlugin().getRegionStorage().getAll().values());
         if(scope == BrowseScope.ALL || scope == BrowseScope.NATIONS)
             territoryList.addAll(TownsAndNations.getPlugin().getNationStorage().getAll().values());
         return territoryList;

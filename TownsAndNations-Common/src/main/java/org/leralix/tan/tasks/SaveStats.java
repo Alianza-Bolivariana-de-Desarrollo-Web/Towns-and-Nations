@@ -24,7 +24,6 @@ public class SaveStats {
 
     public void saveAll() {
         plugin.getNationStorage().save();
-        plugin.getRegionStorage().save();
         plugin.getTownStorage().save();
         plugin.getPlayerDataStorage().save();
         plugin.getClaimStorage().save();

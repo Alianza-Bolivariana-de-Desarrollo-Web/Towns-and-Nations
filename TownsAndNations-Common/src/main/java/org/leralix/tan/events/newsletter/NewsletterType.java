@@ -6,8 +6,6 @@ public enum NewsletterType {
     TOWN_DELETED("player_delete_town_newsletter"),
     PLAYER_APPLICATION("player_application_newsletter"),
     PLAYER_JOIN_TOWN("player_join_town_newsletter"),
-    REGION_CREATED("player_create_region_newsletter"),
-    REGION_DELETED("player_delete_region_newsletter"),
     NATION_CREATED("player_create_nation_newsletter"),
     NATION_DELETED("player_delete_nation_newsletter"),
     TERRITORY_VASSAL_PROPOSAL("territory_vassal_proposal_newsletter"),

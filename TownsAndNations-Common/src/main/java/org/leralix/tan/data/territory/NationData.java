@@ -28,13 +28,13 @@ public class NationData extends TerritoryData implements Nation, TanNation {
 
     private UUID leaderID;
     private String capitalID;
-    private final Set<String> regionsInNation;
+    private final Set<String> townsInNation;
 
-    public NationData(String id, String name, ITanPlayer leader, Region capital) {
+    public NationData(String id, String name, ITanPlayer leader, Town capital) {
         super(id, name, leader);
         this.leaderID = leader.getID();
-        this.capitalID = capital.getID();
-        this.regionsInNation = new HashSet<>();
+        this.capitalID = capital != null ? capital.getID() : null;
+        this.townsInNation = new HashSet<>();
     }
 
     @Override
@@ -155,26 +155,26 @@ public class NationData extends TerritoryData implements Nation, TanNation {
     }
 
     public List<Territory> getSubjects() {
-        List<Territory> regions = new ArrayList<>();
-        for (String regionID : regionsInNation) {
-            regions.add(TerritoryUtil.getTerritory(regionID));
+        List<Territory> towns = new ArrayList<>();
+        for (String townID : townsInNation) {
+            towns.add(TerritoryUtil.getTerritory(townID));
         }
-        return regions;
+        return towns;
     }
 
     @Override
     protected void addVassalPrivate(Territory vassal) {
-        regionsInNation.add(vassal.getID());
+        townsInNation.add(vassal.getID());
     }
 
     @Override
     public void removeVassal(Territory vassal) {
         EventManager.getInstance().callEvent(new TerritoryIndependanceInternalEvent(this, vassal));
-        regionsInNation.remove(vassal.getID());
+        townsInNation.remove(vassal.getID());
 
-        if (vassal instanceof Region regionData) {
+        if (vassal instanceof Town townData) {
             for (RankData rank : getRanks().values()) {
-                for (UUID playerID : regionData.getPlayerIDList()) {
+                for (UUID playerID : townData.getPlayerIDList()) {
                     rank.removePlayer(playerID);
                 }
             }
@@ -193,17 +193,17 @@ public class NationData extends TerritoryData implements Nation, TanNation {
     @Override
     public Territory getCapital() {
         if (capitalID == null) {
-            if (regionsInNation.isEmpty()) {
+            if (townsInNation.isEmpty()) {
                 return null;
             }
-            capitalID = regionsInNation.iterator().next();
+            capitalID = townsInNation.iterator().next();
         }
         return TerritoryUtil.getTerritory(capitalID);
     }
 
     @Override
-    public void setCapital(String regionID) {
-        this.capitalID = regionID;
+    public void setCapital(String townID) {
+        this.capitalID = townID;
     }
 
     @Override
@@ -229,12 +229,12 @@ public class NationData extends TerritoryData implements Nation, TanNation {
 
     @Override
     public Set<String> getVassalsID() {
-        return regionsInNation;
+        return townsInNation;
     }
 
     @Override
     public Collection<Territory> getPotentialVassals() {
-        return new ArrayList<>(TownsAndNations.getPlugin().getRegionStorage().getAll().values());
+        return new ArrayList<>(TownsAndNations.getPlugin().getTownStorage().getAll().values());
     }
 
     @Override

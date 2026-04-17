@@ -207,7 +207,7 @@ public class Constants {
         mobChunkSpawnStorage = new MobChunkSpawnStorage(config.getConfigurationSection("CancelMobSpawnInTown"));
 
         enableNation = config.getBoolean("EnableNation", true);
-        enableRegion = config.getBoolean("EnableRegion", true);
+        enableRegion = false;
         changeTownNameCost = config.getInt("ChangeTownNameCost", 1000);
         changeNationNameCost = config.getInt("ChangeNationNameCost", 1000);
         changeRegionNameCost = config.getInt("ChangeRegionNameCost", 1000);

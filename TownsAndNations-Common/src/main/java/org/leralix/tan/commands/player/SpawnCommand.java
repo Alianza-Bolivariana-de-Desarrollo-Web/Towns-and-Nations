@@ -9,7 +9,6 @@ import org.leralix.tan.lang.LangType;
 import org.leralix.tan.storage.TeleportationRegister;
 import org.leralix.tan.storage.stored.NationStorage;
 import org.leralix.tan.storage.stored.PlayerDataStorage;
-import org.leralix.tan.storage.stored.RegionStorage;
 import org.leralix.tan.storage.stored.TownStorage;
 import org.leralix.tan.utils.text.TanChatUtils;
 
@@ -21,10 +20,9 @@ public class SpawnCommand extends AbstractSpawnCommand {
     public SpawnCommand(
             PlayerDataStorage playerDataStorage,
             TownStorage townStorage,
-            RegionStorage regionDataStorage,
             NationStorage nationDataStorage
     ) {
-        super(playerDataStorage, townStorage, regionDataStorage, nationDataStorage);
+        super(playerDataStorage, townStorage, nationDataStorage);
     }
 
     @Override

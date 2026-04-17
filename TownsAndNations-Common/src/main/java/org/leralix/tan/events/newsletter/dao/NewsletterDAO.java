@@ -27,8 +27,6 @@ public class NewsletterDAO {
         subDaos.put(NewsletterType.TOWN_DELETED, new PlayerDeleteTownDAO(dataSource));
         subDaos.put(NewsletterType.PLAYER_APPLICATION, new PlayerApplicationDAO(dataSource));
         subDaos.put(NewsletterType.PLAYER_JOIN_TOWN, new PlayerJoinTownDAO(dataSource));
-        subDaos.put(NewsletterType.REGION_CREATED, new PlayerCreateRegionDAO(dataSource));
-        subDaos.put(NewsletterType.REGION_DELETED, new PlayerDeleteRegionDAO(dataSource));
         subDaos.put(NewsletterType.NATION_CREATED, new PlayerCreateNationDAO(dataSource));
         subDaos.put(NewsletterType.NATION_DELETED, new PlayerDeleteNationDAO(dataSource));
         subDaos.put(NewsletterType.TERRITORY_VASSAL_PROPOSAL, new TerritoryVassalProposalDAO(dataSource));

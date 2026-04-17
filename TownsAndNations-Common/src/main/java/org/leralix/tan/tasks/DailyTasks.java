@@ -5,7 +5,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.leralix.tan.TownsAndNations;
 import org.leralix.tan.data.building.property.PropertyData;
 import org.leralix.tan.data.player.ITanPlayer;
-import org.leralix.tan.data.territory.Region;
 import org.leralix.tan.data.territory.Town;
 import org.leralix.tan.events.newsletter.NewsletterStorage;
 import org.leralix.tan.storage.database.transactions.TransactionManager;
@@ -47,9 +46,6 @@ public class DailyTasks {
 
         for(Town town : TownsAndNations.getPlugin().getTownStorage().getAll().values()){
             town.executeTasks();
-        }
-        for(Region regionData : TownsAndNations.getPlugin().getRegionStorage().getAll().values()){
-            regionData.executeTasks();
         }
 
         clearOldTransaction();

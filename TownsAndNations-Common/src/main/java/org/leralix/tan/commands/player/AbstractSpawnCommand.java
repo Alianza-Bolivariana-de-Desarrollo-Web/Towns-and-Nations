@@ -7,7 +7,6 @@ import org.leralix.tan.data.territory.Territory;
 import org.leralix.tan.lang.Lang;
 import org.leralix.tan.storage.stored.NationStorage;
 import org.leralix.tan.storage.stored.PlayerDataStorage;
-import org.leralix.tan.storage.stored.RegionStorage;
 import org.leralix.tan.storage.stored.TownStorage;
 import org.leralix.tan.utils.text.TanChatUtils;
 
@@ -17,18 +16,15 @@ public abstract class AbstractSpawnCommand extends PlayerSubCommand {
 
     protected final PlayerDataStorage playerDataStorage;
     protected final TownStorage townStorage;
-    protected final RegionStorage regionStorage;
     protected final NationStorage nationDataStorage;
 
     protected AbstractSpawnCommand(
             PlayerDataStorage playerDataStorage,
             TownStorage townStorage,
-            RegionStorage regionStorage,
             NationStorage nationDataStorage
     ) {
         this.playerDataStorage = playerDataStorage;
         this.townStorage = townStorage;
-        this.regionStorage = regionStorage;
         this.nationDataStorage = nationDataStorage;
     }
 
@@ -49,13 +45,6 @@ public abstract class AbstractSpawnCommand extends PlayerSubCommand {
                         var territoryData = townStorage.get(playerData);
                         if (territoryData == null) {
                             TanChatUtils.message(player, Lang.PLAYER_NO_TOWN.get(playerData.getLang()));
-                        }
-                        yield territoryData;
-                    }
-                    case "region" -> {
-                        var territoryData = regionStorage.get(playerData);
-                        if (territoryData == null) {
-                            TanChatUtils.message(player, Lang.PLAYER_NO_REGION.get(playerData.getLang()));
                         }
                         yield territoryData;
                     }

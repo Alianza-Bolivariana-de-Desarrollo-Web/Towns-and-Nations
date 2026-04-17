@@ -10,6 +10,7 @@ public class ServerCommandManager extends CommandManager {
     public ServerCommandManager(PlayerDataStorage playerDataStorage, TownStorage townStorage, LandmarkStorage landmarkStorage){
         super("tan.server.commands");
         addSubCommand(new CreateTownServer(playerDataStorage, townStorage));
+        addSubCommand(new CreateNationServer(playerDataStorage));
         addSubCommand(new ApplyTownServer(playerDataStorage, townStorage));
         addSubCommand(new QuitTownServer(playerDataStorage));
         addSubCommand(new DisbandTownServer(playerDataStorage));

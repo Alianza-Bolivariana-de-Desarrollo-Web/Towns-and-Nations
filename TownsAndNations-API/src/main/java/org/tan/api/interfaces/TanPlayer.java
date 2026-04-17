@@ -2,7 +2,6 @@ package org.tan.api.interfaces;
 
 import org.tan.api.interfaces.buildings.TanProperty;
 import org.tan.api.interfaces.territory.TanNation;
-import org.tan.api.interfaces.territory.TanRegion;
 import org.tan.api.interfaces.territory.TanTown;
 import org.tan.api.interfaces.war.TanWar;
 
@@ -36,17 +35,6 @@ public interface TanPlayer {
      * @return The town the player is part of or null if the player is not part of a town.
      */
     TanTown getTown();
-
-    /**
-     * @return True if the player is part of a region, false otherwise.
-     */
-    boolean hasRegion();
-
-    /**
-     * Get the region the player is part of.
-     * @return The region the player is part of or {@link Optional#empty()} if the player is not part of a region.
-     */
-    TanRegion getRegion();
 
     /**
      * Get the nation the player is part of.

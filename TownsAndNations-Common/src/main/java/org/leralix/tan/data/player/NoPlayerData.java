@@ -78,11 +78,6 @@ public class NoPlayerData implements ITanPlayer {
     }
 
     @Override
-    public RankData getRegionRank() {
-        return null;
-    }
-
-    @Override
     public void addToBalance(double amount) {
         // singleton class, no need to set name
     }
@@ -90,16 +85,6 @@ public class NoPlayerData implements ITanPlayer {
     @Override
     public void removeFromBalance(double amount) {
         // singleton class, no need to set name
-    }
-
-    @Override
-    public boolean hasRegion() {
-        return false;
-    }
-
-    @Override
-    public RegionData getRegion() {
-        return null;
     }
 
     @Override
@@ -195,16 +180,6 @@ public class NoPlayerData implements ITanPlayer {
     @Override
     public TownRelation getRelationWithPlayer(ITanPlayer otherPlayer) {
         return TownRelation.NEUTRAL;
-    }
-
-    @Override
-    public Integer getRegionRankID() {
-        return 0;
-    }
-
-    @Override
-    public void setRegionRankID(Integer rankID) {
-        // singleton class, no need to set name
     }
 
     @Override

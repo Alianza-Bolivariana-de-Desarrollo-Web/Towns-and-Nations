@@ -128,10 +128,6 @@ public class TownsAndNations extends JavaPlugin {
     private TownStorage townStorage;
 
     /**
-     * Storage of all regions
-     */
-    private RegionStorage regionStorage;
-    /**
      * Storage of all nations
      */
     private NationStorage nationStorage;
@@ -191,7 +187,6 @@ public class TownsAndNations extends JavaPlugin {
                 "claimBlacklist",
                 "wildernessRules",
                 "townPermissions",
-                "regionPermissions",
                 "propertyPermissions"
         );
         YamlConfiguration mainConfig = ConfigUtil.saveAndUpdateResource(this, "config.yml", mainBlackList);
@@ -215,7 +210,6 @@ public class TownsAndNations extends JavaPlugin {
             var config = Constants.getRedisConfig();
             playerDataStorage = new PlayerDatabaseStorage(config);
             townStorage = new TownDatabaseStorage(config);
-            regionStorage = new RegionDatabaseStorage(config);
             nationStorage = new NationDatabaseStorage(config);
             landmarkStorage = new LandmarkDatabaseStorage(config);
             warStorage = new WarDatabaseStorage(config);
@@ -225,7 +219,6 @@ public class TownsAndNations extends JavaPlugin {
         else {
             playerDataStorage = new PlayerJsonStorage();
             townStorage = new TownDataStorage();
-            regionStorage = new RegionDataStorage();
             nationStorage = new NationDataStorage();
             landmarkStorage = new LandmarkDataStorage();
             warStorage = new WarDataStorage();
@@ -262,7 +255,6 @@ public class TownsAndNations extends JavaPlugin {
             new PlaceHolderAPI(
                     playerDataStorage,
                     townStorage,
-                    regionStorage,
                     nationStorage,
                     localChatStorage
                     ).register();
@@ -275,11 +267,9 @@ public class TownsAndNations extends JavaPlugin {
 
         if(Bukkit.getPluginManager().isPluginEnabled("LuckPerms")){
             getLogger().log(Level.INFO, "[TaN] -Registering LuckPerms");
-            var luckpermAPI = new LuckpermAPI();
             luckpermAPI.createContexts(
                     playerDataStorage,
                     townStorage,
-                    regionStorage,
                     nationStorage,
                     TownsAndNations.getPlugin().getClaimStorage()
             );
@@ -303,7 +293,7 @@ public class TownsAndNations extends JavaPlugin {
 
         getLogger().log(Level.INFO, "[TaN] -Loading commands");
         enableEventList();
-        getCommand("tan").setExecutor(new PlayerCommandManager(playerDataStorage, townStorage, regionStorage, nationStorage, localChatStorage));
+        getCommand("tan").setExecutor(new PlayerCommandManager(playerDataStorage, townStorage, nationStorage, localChatStorage));
         getCommand("tanadmin").setExecutor(new AdminCommandManager(playerDataStorage));
         getCommand("tandebug").setExecutor(new DebugCommandManager(saveStats, dailyTasks));
         getCommand("tanserver").setExecutor(new ServerCommandManager(playerDataStorage, townStorage, landmarkStorage));
@@ -516,10 +506,6 @@ public class TownsAndNations extends JavaPlugin {
 
     public TownStorage getTownStorage() {
         return townStorage;
-    }
-
-    public RegionStorage getRegionStorage() {
-        return regionStorage;
     }
 
     public NationStorage getNationStorage() {

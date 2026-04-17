@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.leralix.tan.data.player.ITanPlayer;
 import org.leralix.tan.data.territory.Nation;
+import org.leralix.tan.data.territory.Region;
 import org.leralix.tan.data.timezone.TimeZoneManager;
 import org.leralix.tan.gui.BasicGui;
 import org.leralix.tan.gui.common.PlayerGUI;
@@ -92,6 +93,26 @@ public class MainMenu extends BasicGui {
                 .setName(Lang.GUI_NATION_ICON.get(tanPlayer))
                 .setDescription(description)
                 .setAction(action -> PlayerGUI.dispatchPlayerNation(player, tanPlayer))
+                .asGuiItem(player, langType);
+    }
+
+    private GuiItem getRegionButton(ITanPlayer tanPlayer) {
+
+        List<FilledLang> description = new ArrayList<>();
+
+        if (tanPlayer.hasRegion()) {
+            Region regionData = tanPlayer.getRegion();
+            description.add(Lang.GUI_REGION_ICON_DESC1_REGION.get(regionData.getColoredName()));
+            description.add(Lang.GUI_REGION_ICON_DESC2_REGION.get(regionData.getRank(tanPlayer).getColoredName()));
+        } else {
+            description.add(Lang.GUI_REGION_ICON_DESC1_NO_REGION.get());
+        }
+
+
+        return iconManager.get(IconKey.REGION_BASE_ICON)
+                .setName(Lang.GUI_REGION_ICON.get(tanPlayer))
+                .setDescription(description)
+                .setAction(action -> PlayerGUI.dispatchPlayerRegion(player, tanPlayer))
                 .asGuiItem(player, langType);
     }
 

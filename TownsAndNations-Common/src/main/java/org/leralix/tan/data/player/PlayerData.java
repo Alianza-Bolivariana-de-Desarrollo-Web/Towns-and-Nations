@@ -38,6 +38,7 @@ public class PlayerData implements ITanPlayer {
     private Double Balance;
     private String TownId;
     private Integer townRankID;
+    private Integer regionRankID;
     private Integer nationRankID;
     private List<String> propertiesListID;
     private List<String> attackInvolvedIn;
@@ -144,12 +145,31 @@ public class PlayerData implements ITanPlayer {
         return getTown().getRank(getTownRankID());
     }
 
+    public RankData getRegionRank() {
+        if (!hasRegion())
+            return null;
+        return getRegion().getRank(getRegionRankID());
+    }
+
     public void addToBalance(double amount) {
         this.Balance = this.Balance + amount;
     }
 
     public void removeFromBalance(double amount) {
         this.Balance = this.Balance - amount;
+    }
+
+    public boolean hasRegion() {
+        var town = getTown();
+        if (town == null)
+            return false;
+        return town.haveOverlord();
+    }
+
+    public Region getRegion() {
+        if (!hasRegion())
+            return null;
+        return getTown().getRegion().orElse(null);
     }
 
     public void joinTown(TownData townData) {
@@ -302,6 +322,20 @@ public class PlayerData implements ITanPlayer {
         return playerTown.getRelationWith(otherPlayerTown);
     }
 
+    public Integer getRegionRankID() {
+        if(!hasRegion()){
+            return null;
+        }
+        if (regionRankID == null)
+            regionRankID = getRegion().getDefaultRankID();
+        return regionRankID;
+    }
+
+    @Override
+    public void setRegionRankID(Integer rankID) {
+        regionRankID = rankID;
+    }
+
     @Override
     public RankData getRank(Territory territoryData) {
         return territoryData.getRank(getRankID(territoryData));
@@ -311,6 +345,9 @@ public class PlayerData implements ITanPlayer {
         List<Territory> territories = new ArrayList<>();
         if (hasTown()) {
             territories.add(getTown());
+        }
+        if (hasRegion()) {
+            territories.add(getRegion());
         }
         if (hasNation()) {
             territories.add(getNation());
@@ -386,11 +423,8 @@ public class PlayerData implements ITanPlayer {
         if(optTown == null){
             return null;
         }
-        var optOverlord = optTown.getOverlordInternal();
-        if(optOverlord.isPresent() && optOverlord.get() instanceof Nation nation){
-            return nation;
-        }
-        return null;
+        var optRegion = optTown.getRegion();
+        return optRegion.flatMap(Region::getNation).orElse(null);
     }
 
     @Override
@@ -424,6 +458,9 @@ public class PlayerData implements ITanPlayer {
     public Integer getRankID(Territory territoryData) {
         if(territoryData instanceof Town){
             return getTownRankID();
+        }
+        if(territoryData instanceof Region){
+            return getRegionRankID();
         }
         if(territoryData instanceof Nation){
             return getNationRankID();

@@ -33,9 +33,11 @@ public class TanContextCalculator implements ContextCalculator<Player> {
     private static final String IS_AT_WAR = "tan:is-at-war";
 
     private static final String HAS_TOWN = "tan:has-town";
+    private static final String HAS_REGION = "tan:has-region";
     private static final String HAS_NATION = "tan:has-nation";
 
     private static final String IS_TOWN_LEADER = "tan:is-town-leader";
+    private static final String IS_REGION_LEADER = "tan:is-region-leader";
     private static final String IS_NATION_LEADER = "tan:is-nation-leader";
 
     private static final String IS_IN_FRIENDLY_CLAIM = "tan:is-in-friendly-claims";
@@ -47,10 +49,12 @@ public class TanContextCalculator implements ContextCalculator<Player> {
     private static final String IS_IN_RENTED_PROPERTY = "tan:is-in-rented-property";
 
     private static final String IS_PART_OF_TOWN = "tan:is-part-of-town";
+    private static final String IS_PART_OF_REGION = "tan:is-part-of-region";
     private static final String IS_PART_OF_NATION = "tan:is-part-of-nation";
     private static final String TERRITORY_NAME = "tan:territory-name";
 
     private static final String TOWN_HAS_UNLOCKED_UPGRADE = "tan:town-has-unlocked-<upgrade_id>";
+    private static final String REGION_HAS_UNLOCKED_UPGRADE = "tan:region-has-unlocked-<upgrade_id>";
     private static final String NATION_HAS_UNLOCKED_UPGRADE = "tan:nation-has-unlocked-<upgrade_id>";
 
 
@@ -60,17 +64,20 @@ public class TanContextCalculator implements ContextCalculator<Player> {
 
     private final PlayerDataStorage playerDataStorage;
     private final TownStorage townStorage;
+    private final RegionStorage regionDataStorage;
     private final NationStorage nationDataStorage;
     private final ClaimStorage chunkStorage;
 
     public TanContextCalculator(
             PlayerDataStorage playerDataStorage,
             TownStorage townStorage,
+            RegionStorage regionDataStorage,
             NationStorage nationDataStorage,
             ClaimStorage chunkStorage
     ){
         this.playerDataStorage = playerDataStorage;
         this.townStorage = townStorage;
+        this.regionDataStorage = regionDataStorage;
         this.nationDataStorage = nationDataStorage;
         this.chunkStorage = chunkStorage;
     }
@@ -81,8 +88,10 @@ public class TanContextCalculator implements ContextCalculator<Player> {
         ITanPlayer playerData = playerDataStorage.get(player);
 
         boolean hasTown = playerData.hasTown();
+        boolean hasRegion = playerData.hasRegion();
         boolean hasNation = playerData.hasNation();
         consumer.accept(HAS_TOWN, Boolean.toString(hasTown));
+        consumer.accept(HAS_REGION, Boolean.toString(hasRegion));
         consumer.accept(HAS_NATION, Boolean.toString(hasNation));
 
         consumer.accept(IS_AT_WAR, playerData.getWarsParticipatingIn().isEmpty() ? FALSE : TRUE);
@@ -95,9 +104,17 @@ public class TanContextCalculator implements ContextCalculator<Player> {
         }
         registerUpgradesOfTerritory(playerTown, consumer);
 
-        TanNation playerNation = nationDataStorage.get(playerData);
+        Region playerRegion = regionDataStorage.get(playerTown);
+        consumer.accept(IS_REGION_LEADER, isTerritoryLeader(player, playerRegion));
+        String regionName = getNameOfTerritory(playerRegion);
+        if(regionName != null){
+            consumer.accept(IS_PART_OF_REGION, regionName);
+        }
+        registerUpgradesOfTerritory(playerRegion, consumer);
+
+        TanNation playerNation = nationDataStorage.get(playerRegion);
         consumer.accept(IS_NATION_LEADER, isTerritoryLeader(player, playerNation));
-        String nationName = getNameOfTerritory(playerNation);
+        String nationName = getNameOfTerritory(playerRegion);
         if(nationName != null){
             consumer.accept(IS_PART_OF_NATION, nationName);
         }
@@ -166,6 +183,10 @@ public class TanContextCalculator implements ContextCalculator<Player> {
                 statsType = StatsType.TOWN;
                 consumerKey = TOWN_HAS_UNLOCKED_UPGRADE;
             }
+            case TanRegion ignored -> {
+                statsType = StatsType.REGION;
+                consumerKey = REGION_HAS_UNLOCKED_UPGRADE;
+            }
             case TanNation ignored -> {
                 statsType = StatsType.NATION;
                 consumerKey = NATION_HAS_UNLOCKED_UPGRADE;
@@ -225,8 +246,10 @@ public class TanContextCalculator implements ContextCalculator<Player> {
                 .add(IS_IN_RENTED_PROPERTY, TRUE)
                 .add(IS_IN_RENTED_PROPERTY, FALSE)
                 .add(IS_PART_OF_TOWN, TERRITORY_NAME)
+                .add(IS_PART_OF_REGION, TERRITORY_NAME)
                 .add(IS_PART_OF_NATION, TERRITORY_NAME)
                 .add(TOWN_HAS_UNLOCKED_UPGRADE, UPGRADE_NAME)
+                .add(REGION_HAS_UNLOCKED_UPGRADE, UPGRADE_NAME)
                 .add(NATION_HAS_UNLOCKED_UPGRADE, UPGRADE_NAME)
                 .build();
     }

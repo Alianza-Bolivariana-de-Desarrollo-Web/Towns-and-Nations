@@ -41,9 +41,15 @@ public interface ITanPlayer extends TanPlayer {
 
     RankData getTownRank();
 
+    RankData getRegionRank();
+
     void addToBalance(double amount);
 
     void removeFromBalance(double amount);
+
+    boolean hasRegion();
+
+    Region getRegion();
 
     void joinTown(TownData townData);
 
@@ -77,6 +83,10 @@ public interface ITanPlayer extends TanPlayer {
     void removeWar(@NotNull CurrentAttack currentAttacks);
 
     TownRelation getRelationWithPlayer(ITanPlayer otherPlayer);
+
+    Integer getRegionRankID();
+
+    void setRegionRankID(Integer rankID);
 
     Nation getNation();
 

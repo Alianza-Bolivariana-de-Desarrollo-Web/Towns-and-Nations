@@ -31,8 +31,8 @@ public class NationData extends TerritoryData implements Nation, TanNation {
     private final Set<String> townsInNation;
 
     public NationData(String id, String name, ITanPlayer leader, Town capital) {
-        super(id, name, leader);
-        this.leaderID = leader.getID();
+        super(id, name, leader != null ? leader : (capital != null ? capital.getLeaderData() : null));
+        this.leaderID = leader != null ? leader.getID() : (capital != null ? capital.getLeaderID() : null);
         this.capitalID = capital != null ? capital.getID() : null;
         this.townsInNation = new HashSet<>();
     }

@@ -419,11 +419,17 @@ public class PlayerData implements ITanPlayer {
     @Override
     public Nation getNation() {
 
-        var optTown = getTown();
-        if(optTown == null){
+        Town town = getTown();
+        if (town == null) {
             return null;
         }
-        var optRegion = optTown.getRegion();
+
+        var directOverlord = town.getOverlordInternal();
+        if (directOverlord.isPresent() && directOverlord.get() instanceof Nation directNation) {
+            return directNation;
+        }
+
+        var optRegion = town.getRegion();
         return optRegion.flatMap(Region::getNation).orElse(null);
     }
 

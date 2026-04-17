@@ -3,7 +3,7 @@ package org.leralix.tan.gui.user.territory;
 import dev.triumphteam.gui.guis.GuiItem;
 import org.bukkit.entity.Player;
 import org.leralix.tan.TownsAndNations;
-import org.leralix.tan.data.territory.Region;
+import org.leralix.tan.data.territory.Town;
 import org.leralix.tan.gui.BasicGui;
 import org.leralix.tan.gui.cosmetic.IconKey;
 import org.leralix.tan.gui.scope.BrowseScope;
@@ -26,9 +26,53 @@ public class NoNationMenu extends BasicGui {
 
     @Override
     public void open() {
+        gui.setItem(2, 3, getCreateNationButton());
         gui.setItem(2, 7, getBrowseNationsButton());
         gui.setItem(3, 1, GuiUtil.createBackArrow(player, p -> new MainMenu(player), langType));
         gui.open(player);
+    }
+
+    private GuiItem getCreateNationButton() {
+        int nationCost = Constants.getNationCost();
+
+        return iconManager.get(IconKey.CREATE_NATION_ICON)
+                .setName(Lang.GUI_NATION_CREATE.get(tanPlayer))
+                .setDescription(
+                        Lang.GUI_NATION_CREATE_DESC1.get(Integer.toString(nationCost)),
+                        Lang.GUI_NATION_CREATE_DESC2.get()
+                )
+                .setAction(action -> {
+                    if (!player.hasPermission("tan.base.nation.create")) {
+                        TanChatUtils.message(player, Lang.PLAYER_NO_PERMISSION.get(tanPlayer), NOT_ALLOWED);
+                        return;
+                    }
+
+                    if (!tanPlayer.hasTown()) {
+                        TanChatUtils.message(player, Lang.PLAYER_NO_TOWN.get(tanPlayer), NOT_ALLOWED);
+                        return;
+                    }
+
+                    Town townData = tanPlayer.getTown();
+                    if (!townData.isLeader(tanPlayer)) {
+                        TanChatUtils.message(player, Lang.PLAYER_ONLY_LEADER_CAN_PERFORM_ACTION.get(tanPlayer), NOT_ALLOWED);
+                        return;
+                    }
+
+                    if (townData.haveOverlord()) {
+                        TanChatUtils.message(player, Lang.TOWN_ALREADY_HAVE_OVERLORD.get(tanPlayer), NOT_ALLOWED);
+                        return;
+                    }
+
+                    double townMoney = townData.getBalance();
+                    if (townMoney < nationCost) {
+                        TanChatUtils.message(player, Lang.TERRITORY_NOT_ENOUGH_MONEY.get(tanPlayer, townData.getColoredName(), Double.toString(nationCost - townMoney)));
+                        return;
+                    }
+
+                    TanChatUtils.message(player, Lang.WRITE_IN_CHAT_NEW_NATION_NAME.get(tanPlayer));
+                    PlayerChatListenerStorage.register(player, langType, new CreateNation(nationCost));
+                })
+                .asGuiItem(player, langType);
     }
 
     private GuiItem getBrowseNationsButton() {

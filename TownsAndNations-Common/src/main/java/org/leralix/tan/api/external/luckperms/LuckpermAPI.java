@@ -23,6 +23,7 @@ public class LuckpermAPI {
     public void createContexts(
             PlayerDataStorage playerDataStorage,
             TownStorage townStorage,
+            RegionStorage regionDataStorage,
             NationStorage nationDataStorage,
             ClaimStorage chunkStorage
     ){
@@ -30,6 +31,7 @@ public class LuckpermAPI {
                 new TanContextCalculator(
                         playerDataStorage,
                         townStorage,
+                        regionDataStorage,
                         nationDataStorage,
                         chunkStorage
                 )

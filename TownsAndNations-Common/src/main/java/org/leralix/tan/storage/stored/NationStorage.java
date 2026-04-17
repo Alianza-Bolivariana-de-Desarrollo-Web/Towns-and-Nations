@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import org.leralix.tan.data.player.ITanPlayer;
 import org.leralix.tan.data.territory.Nation;
 import org.leralix.tan.data.territory.Region;
+import org.leralix.tan.data.territory.Town;
 
 import java.util.Map;
 
@@ -20,10 +21,10 @@ public interface NationStorage {
         if(playerData == null || !playerData.hasNation()){
             return null;
         }
-        return get(playerData.getNationId());
+        return playerData.getNation();
     }
 
-    Nation newNation(String name, Town capital);
+    Nation newNation(String name, @NotNull Town capital);
 
     Nation get(String nationID);
 

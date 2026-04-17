@@ -6,6 +6,7 @@ import org.leralix.lib.commands.SubCommand;
 import org.leralix.tan.TownsAndNations;
 import org.leralix.tan.lang.Lang;
 import org.leralix.tan.listeners.chat.events.CreateNation;
+import org.leralix.tan.data.player.ITanPlayer;
 import org.leralix.tan.storage.stored.PlayerDataStorage;
 import org.leralix.tan.utils.text.NameFilter;
 import org.leralix.tan.utils.text.TanChatUtils;
@@ -28,7 +29,7 @@ class CreateNationServer extends SubCommand {
 
     @Override
     public String getDescription() {
-        return Lang.CREATE_NATION_SERVER_DESC.getDefault();
+        return "Create a nation";
     }
 
     @Override
@@ -72,6 +73,11 @@ class CreateNationServer extends SubCommand {
             TanChatUtils.message(commandSender, Lang.NAME_ALREADY_USED);
             return;
         }
-        new CreateNation(0).createNation(leader, playerDataStorage.get(leader), nationName);
+        ITanPlayer tanLeader = playerDataStorage.get(leader);
+        if (!tanLeader.hasTown()) {
+            TanChatUtils.message(commandSender, Lang.PLAYER_NO_TOWN);
+            return;
+        }
+        new CreateNation(0).createNation(leader, tanLeader, nationName, tanLeader.getTown());
     }
 }

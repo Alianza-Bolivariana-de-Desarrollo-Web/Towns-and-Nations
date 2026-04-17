@@ -45,14 +45,12 @@ public class NationDataStorage extends JsonStorage<Nation> implements NationStor
     }
 
     @Override
-    public Nation newNation(String name, Town capital) {
+    public Nation newNation(String name, @NotNull Town capital) {
         String nationID = generateNextID();
-        NationData nationData = new NationData(nationID, name, null, capital);
+        NationData nationData = new NationData(nationID, name, capital.getLeaderData(), capital);
 
         put(nationID, nationData);
-        if (capital != null) {
-            capital.setOverlord(nationData);
-        }
+        capital.setOverlord(nationData);
 
         return nationData;
     }

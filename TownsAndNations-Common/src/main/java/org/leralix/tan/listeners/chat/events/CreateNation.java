@@ -4,6 +4,7 @@ import org.bukkit.entity.Player;
 import org.leralix.tan.TownsAndNations;
 import org.leralix.tan.data.player.ITanPlayer;
 import org.leralix.tan.data.territory.Nation;
+import org.leralix.tan.data.territory.Town;
 import org.leralix.tan.events.EventManager;
 import org.leralix.tan.events.events.NationCreatedInternalEvent;
 import org.leralix.tan.gui.common.PlayerGUI;
@@ -26,8 +27,29 @@ public class CreateNation extends ChatListenerEvent {
     @Override
     public boolean execute(Player player, ITanPlayer tanPlayer, String message) {
 
-        if (!player.hasPermission("tan.admin.commands")) {
+        if (!player.hasPermission("tan.base.nation.create")) {
             TanChatUtils.message(player, Lang.PLAYER_NO_PERMISSION.get(tanPlayer));
+            return false;
+        }
+        if (!tanPlayer.hasTown()) {
+            TanChatUtils.message(player, Lang.PLAYER_NO_TOWN.get(tanPlayer));
+            return false;
+        }
+        Town capital = tanPlayer.getTown();
+        if (!capital.isLeader(tanPlayer)) {
+            TanChatUtils.message(player, Lang.PLAYER_ONLY_LEADER_CAN_PERFORM_ACTION.get(tanPlayer));
+            return false;
+        }
+        if (capital.haveOverlord()) {
+            TanChatUtils.message(player, Lang.TOWN_ALREADY_HAVE_OVERLORD.get(tanPlayer));
+            return false;
+        }
+        if (capital.getBalance() < cost) {
+            TanChatUtils.message(player, Lang.TERRITORY_NOT_ENOUGH_MONEY.get(
+                    tanPlayer,
+                    capital.getColoredName(),
+                    Double.toString(cost - capital.getBalance())
+            ));
             return false;
         }
 
@@ -48,12 +70,13 @@ public class CreateNation extends ChatListenerEvent {
             return false;
         }
 
-        createNation(player, tanPlayer, nationName);
+        createNation(player, tanPlayer, nationName, capital);
         return true;
     }
 
-    private void createNation(Player player, ITanPlayer playerData, String nationName) {
-        Nation nation = TownsAndNations.getPlugin().getNationStorage().newNation(nationName, null);
+    public void createNation(Player player, ITanPlayer playerData, String nationName, Town capital) {
+        capital.removeFromBalance(cost);
+        Nation nation = TownsAndNations.getPlugin().getNationStorage().newNation(nationName, capital);
 
         EventManager.getInstance().callEvent(new NationCreatedInternalEvent(nation, playerData));
         FileUtil.addLineToHistory(Lang.NATION_CREATED_NEWSLETTER.get(player.getName(), nation.getName()));

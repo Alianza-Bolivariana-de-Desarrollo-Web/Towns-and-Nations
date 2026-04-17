@@ -33,14 +33,12 @@ public class NationDatabaseStorage extends DatabaseStorage<NationDatabase, Natio
     }
 
     @Override
-    public Nation newNation(String name, Town capital) {
-        NationData newNation = new NationData("N" + getNextID(), name, null, capital);
+    public Nation newNation(String name, @NotNull Town capital) {
+        NationData newNation = new NationData("N" + getNextID(), name, capital.getLeaderData(), capital);
         databaseManager.save(newNation);
         Nation loadedNation = getOrLoad(newNation.getID(), this::load);
 
-        if (capital != null) {
-            capital.setOverlord(loadedNation);
-        }
+        capital.setOverlord(loadedNation);
         return loadedNation;
     }
 

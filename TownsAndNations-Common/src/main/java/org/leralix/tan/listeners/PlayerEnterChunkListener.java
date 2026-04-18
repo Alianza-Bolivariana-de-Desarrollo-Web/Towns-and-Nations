@@ -8,8 +8,10 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import org.jetbrains.annotations.NotNull;
 import org.leralix.tan.data.chunk.IClaimedChunk;
 import org.leralix.tan.data.chunk.TerritoryChunk;
+import org.leralix.tan.data.chunk.TerritoryEnterMessageUtil;
 import org.leralix.tan.data.chunk.WildernessChunkData;
 import org.leralix.tan.data.player.ITanPlayer;
+import org.leralix.tan.data.territory.Territory;
 import org.leralix.tan.data.territory.relation.TownRelation;
 import org.leralix.tan.gui.scope.ClaimType;
 import org.leralix.tan.lang.Lang;
@@ -44,34 +46,46 @@ public class PlayerEnterChunkListener implements Listener {
 
         Player player = event.getPlayer();
 
-        // If both chunks are not claimed, no need to display anything
-        if (!claimStorage.isChunkClaimed(currentChunk) &&
-                !claimStorage.isChunkClaimed(nextChunk)) {
+        IClaimedChunk currentClaimedChunk = claimStorage.get(currentChunk);
+        IClaimedChunk nextClaimedChunk = claimStorage.get(nextChunk);
+        ITanPlayer tanPlayer = playerDataStorage.get(player);
 
-            if (PlayerAutoClaimStorage.containsPlayer(event.getPlayer())) {
+        // Both chunks have the same owner, no need to change
+        if (sameOwner(currentClaimedChunk, nextClaimedChunk)) {
+            if (nextClaimedChunk instanceof WildernessChunkData &&
+                    PlayerAutoClaimStorage.containsPlayer(event.getPlayer())) {
                 autoClaimChunk(event, nextChunk, player);
             }
             return;
         }
 
-        IClaimedChunk currentClaimedChunk = claimStorage.get(currentChunk);
-        IClaimedChunk nextClaimedChunk = claimStorage.get(nextChunk);
-
-        // Both chunks have the same owner, no need to change
-        if (sameOwner(currentClaimedChunk, nextClaimedChunk)) {
+        // Do not display enter messages when moving into wilderness.
+        // Keep auto-claim behaviour unchanged.
+        if (nextClaimedChunk instanceof WildernessChunkData) {
+            if (currentClaimedChunk instanceof TerritoryChunk currentTerritoryChunk) {
+                Territory currentTerritory = currentTerritoryChunk.getOwnerInternal();
+                if (currentTerritory != null) {
+                    TerritoryEnterMessageUtil.sendLeaveTerritoryMessage(player, currentTerritory, displayTerritoryNamewithColor);
+                }
+            }
+            if (PlayerAutoClaimStorage.containsPlayer(event.getPlayer())) {
+                autoClaimChunk(event, nextChunk, player);
+            }
             return;
         }
         // If territory denies access to players with a certain relation.
-        ITanPlayer tanPlayer = playerDataStorage.get(player);
 
         if (nextClaimedChunk instanceof TerritoryChunk territoryChunk) {
-            TownRelation worstRelation = territoryChunk.getOwnerInternal().getWorstRelationWith(tanPlayer);
-            if (!Constants.getRelationConstants(worstRelation).canAccessTerritory()) {
-                event.setCancelled(true);
-                LangType lang = tanPlayer.getLang();
-                TanChatUtils.message(player, Lang.PLAYER_CANNOT_ENTER_CHUNK_WITH_RELATION.get(lang,
-                        territoryChunk.getOwner().getColoredName(), worstRelation.getColoredName(lang)));
-                return;
+            Territory ownerTerritory = territoryChunk.getOwnerInternal();
+            if (ownerTerritory != null) {
+                TownRelation worstRelation = ownerTerritory.getWorstRelationWith(tanPlayer);
+                if (!Constants.getRelationConstants(worstRelation).canAccessTerritory()) {
+                    event.setCancelled(true);
+                    LangType lang = tanPlayer.getLang();
+                    TanChatUtils.message(player, Lang.PLAYER_CANNOT_ENTER_CHUNK_WITH_RELATION.get(lang,
+                            ownerTerritory.getColoredName(), worstRelation.getColoredName(lang)));
+                    return;
+                }
             }
         }
 

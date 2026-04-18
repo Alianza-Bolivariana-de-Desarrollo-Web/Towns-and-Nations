@@ -10,10 +10,12 @@ jar {
 
 shadowJar {
     archiveBaseName = "TownsAndNations"
+    from sourceSets.main.output
 }
 
 tasks.shadowJar {
     archiveClassifier.set('')
+    from(sourceSets.main.output)
     relocate 'org.bstats', 'org.leralix.tan.bstat'
 }
 

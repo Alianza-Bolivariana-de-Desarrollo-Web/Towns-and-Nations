@@ -48,7 +48,9 @@ public class WildernessChunkData extends ChunkData implements WildernessChunk {
 
     @Override
     public void playerEnterClaimedArea(Player player, ITanPlayer tanPlayer, boolean displayTerritoryColor) {
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(Lang.WILDERNESS.get(tanPlayer)));
+        String wilderness = Lang.WILDERNESS.get(tanPlayer);
+        player.sendTitle("", wilderness, 5, 30, 15);
+        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(wilderness));
     }
 
     @Override

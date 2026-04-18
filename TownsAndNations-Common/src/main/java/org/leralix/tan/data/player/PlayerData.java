@@ -344,13 +344,22 @@ public class PlayerData implements ITanPlayer {
     public List<Territory> getAllTerritoriesPlayerIsIn() {
         List<Territory> territories = new ArrayList<>();
         if (hasTown()) {
-            territories.add(getTown());
+            Territory town = getTown();
+            if (town != null) {
+                territories.add(town);
+            }
         }
         if (hasRegion()) {
-            territories.add(getRegion());
+            Territory region = getRegion();
+            if (region != null) {
+                territories.add(region);
+            }
         }
         if (hasNation()) {
-            territories.add(getNation());
+            Territory nation = getNation();
+            if (nation != null) {
+                territories.add(nation);
+            }
         }
         return territories;
     }

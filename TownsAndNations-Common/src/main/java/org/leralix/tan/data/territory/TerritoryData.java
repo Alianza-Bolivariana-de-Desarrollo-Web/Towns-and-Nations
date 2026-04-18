@@ -298,6 +298,9 @@ public abstract class TerritoryData implements TanTerritory, Territory {
     public TownRelation getWorstRelationWith(ITanPlayer player) {
         TownRelation worstRelation = null;
         for (Territory territoryData : player.getAllTerritoriesPlayerIsIn()) {
+            if (territoryData == null) {
+                continue;
+            }
             TownRelation actualRelation = getRelationWith(territoryData);
             if (worstRelation == null || worstRelation.isSuperiorTo(actualRelation)) {
                 worstRelation = actualRelation;

@@ -19,13 +19,28 @@ public class TerritoryUtil {
     }
 
     public static Territory getTerritory(String id){
+        if (id == null || id.isBlank()) {
+            return null;
+        }
         if(id.startsWith("T")) {
             return TownsAndNations.getPlugin().getTownStorage().get(id);
         }
         if (id.startsWith("N")) {
             return TownsAndNations.getPlugin().getNationStorage().get(id);
         }
-        return null;
+        if (id.startsWith("R")) {
+            return TownsAndNations.getPlugin().getRegionStorage().get(id);
+        }
+
+        Territory fromTown = TownsAndNations.getPlugin().getTownStorage().get(id);
+        if (fromTown != null) {
+            return fromTown;
+        }
+        Territory fromNation = TownsAndNations.getPlugin().getNationStorage().get(id);
+        if (fromNation != null) {
+            return fromNation;
+        }
+        return TownsAndNations.getPlugin().getRegionStorage().get(id);
     }
 
     public static boolean isNameUsed(String name, Collection<? extends Territory> territories){

@@ -1,8 +1,10 @@
 package org.leralix.tan.data.chunk;
 
+import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
+import net.md_5.bungee.api.ChatMessageType;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -110,9 +112,17 @@ public abstract class TerritoryChunkData extends ChunkData implements TerritoryC
 
     @Override
     public void playerEnterClaimedArea(Player player, ITanPlayer tanPlayer, boolean displayTerritoryColor) {
-        TanTerritory ownerTerritory = getOwner();
-
-        Territory territoryData = TerritoryUtil.getTerritory(ownerTerritory.getID());
+        Territory territoryData = getOwnerInternal();
+        if (territoryData == null) {
+            String fallbackName = getOwnerID() == null ? Lang.WILDERNESS.get(tanPlayer) : getOwnerID();
+            String subtitle = Lang.PLAYER_ENTER_TERRITORY_CHUNK.get(tanPlayer.getLang(), fallbackName);
+            player.sendTitle("", subtitle, 5, 40, 20);
+            player.sendMessage(subtitle);
+            TextComponent textComponent = new TextComponent(fallbackName);
+            textComponent.setColor(ChatColor.GRAY);
+            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, textComponent);
+            return;
+        }
 
         TerritoryEnterMessageUtil.sendEnterTerritoryMessage(player, territoryData, displayTerritoryColor, tanPlayer.getLang());
 

@@ -57,5 +57,6 @@ public final class TerritoryEnterMessageUtil {
             }
         }
         player.sendTitle(title, subtitle, 5, 35, 15);
+        player.sendMessage(subtitle);
     }
 }

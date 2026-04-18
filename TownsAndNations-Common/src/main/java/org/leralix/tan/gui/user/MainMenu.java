@@ -32,25 +32,35 @@ public class MainMenu extends BasicGui {
 
         gui.setItem(1, 5, getTimeIcon());
 
+        boolean showNation = Constants.enableNation();
+        boolean showRegion = Constants.enableRegion();
+
         int nationPosition = 2;
         int regionPosition = 4;
         int townPosition = 6;
         int playerPosition = 8;
 
-        if (Constants.enableRegion()) {
-            if (Constants.enableNation()) {
-                gui.setItem(2, nationPosition, getNationButton(tanPlayer));
-            } else {
+        if (showRegion) {
+            if (!showNation) {
                 regionPosition = 3;
                 townPosition = 5;
                 playerPosition = 7;
             }
             gui.setItem(2, regionPosition, getRegionButton(tanPlayer));
         } else {
-            townPosition = 4;
-            playerPosition = 6;
+            if (showNation) {
+                nationPosition = 3;
+                townPosition = 5;
+                playerPosition = 7;
+            } else {
+                townPosition = 4;
+                playerPosition = 6;
+            }
         }
 
+        if (showNation) {
+            gui.setItem(2, nationPosition, getNationButton(tanPlayer));
+        }
         gui.setItem(2, townPosition, getTownButton(tanPlayer));
         gui.setItem(2, playerPosition, getPlayerButton(tanPlayer));
 

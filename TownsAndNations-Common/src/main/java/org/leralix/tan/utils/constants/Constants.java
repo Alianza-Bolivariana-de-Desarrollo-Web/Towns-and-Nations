@@ -72,6 +72,7 @@ public class Constants {
 
     private static boolean enableNation;
     private static boolean enableRegion;
+    private static boolean allowPlayerCreateNation;
     private static int changeTownNameCost;
     private static int changeNationNameCost;
     private static int changeRegionNameCost;
@@ -208,6 +209,7 @@ public class Constants {
 
         enableNation = config.getBoolean("EnableNation", true);
         enableRegion = false;
+        allowPlayerCreateNation = config.getBoolean("AllowPlayerCreateNation", true);
         changeTownNameCost = config.getInt("ChangeTownNameCost", 1000);
         changeNationNameCost = config.getInt("ChangeNationNameCost", 1000);
         changeRegionNameCost = config.getInt("ChangeRegionNameCost", 1000);
@@ -439,6 +441,10 @@ public class Constants {
 
     public static boolean enableRegion() {
         return enableRegion;
+    }
+
+    public static boolean allowPlayerCreateNation() {
+        return allowPlayerCreateNation;
     }
 
     public static int getChangeTerritoryNameCost(Territory territoryData) {

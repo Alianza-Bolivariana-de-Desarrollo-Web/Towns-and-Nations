@@ -42,7 +42,7 @@ public class NationDatabase extends TerritoryDatabase<Nation> implements Databas
     }
 
     @Override
-    public void setCapital(String regionID) {
-        mutate(p -> p.setCapital(regionID));
+    public void setCapital(String townID) {
+        mutate(p -> p.setCapital(townID));
     }
 }

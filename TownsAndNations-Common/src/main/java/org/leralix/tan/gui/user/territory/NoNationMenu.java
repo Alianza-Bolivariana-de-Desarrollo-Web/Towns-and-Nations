@@ -26,10 +26,19 @@ public class NoNationMenu extends BasicGui {
 
     @Override
     public void open() {
-        gui.setItem(2, 3, getCreateNationButton());
+        if (canCreateNation()) {
+            gui.setItem(2, 3, getCreateNationButton());
+        }
         gui.setItem(2, 7, getBrowseNationsButton());
         gui.setItem(3, 1, GuiUtil.createBackArrow(player, p -> new MainMenu(player), langType));
         gui.open(player);
+    }
+
+    private boolean canCreateNation() {
+        if (player.hasPermission("tan.admin.commands")) {
+            return true;
+        }
+        return Constants.allowPlayerCreateNation() && player.hasPermission("tan.base.nation.create");
     }
 
     private GuiItem getCreateNationButton() {
@@ -42,7 +51,7 @@ public class NoNationMenu extends BasicGui {
                         Lang.GUI_NATION_CREATE_DESC2.get()
                 )
                 .setAction(action -> {
-                    if (!player.hasPermission("tan.base.nation.create")) {
+                    if (!canCreateNation()) {
                         TanChatUtils.message(player, Lang.PLAYER_NO_PERMISSION.get(tanPlayer), NOT_ALLOWED);
                         return;
                     }

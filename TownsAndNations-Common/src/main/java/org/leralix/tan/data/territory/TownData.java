@@ -359,8 +359,14 @@ public class TownData extends TerritoryData implements Town {
 
     @Override
     public void removeOverlordPrivate() {
+        boolean wasNationOverlord = getOverlordInternal()
+                .map(overlord -> overlord instanceof Nation)
+                .orElse(false);
         for (ITanPlayer tanPlayer : getITanPlayerList()) {
             tanPlayer.setRegionRankID(null);
+            if (wasNationOverlord) {
+                tanPlayer.setNationRankID(null);
+            }
         }
     }
 
@@ -498,7 +504,7 @@ public class TownData extends TerritoryData implements Town {
     public synchronized void delete() {
         super.delete();
 
-        getRegion().ifPresent(regionData -> regionData.removeVassal(this));
+        getOverlordInternal().ifPresent(overlord -> overlord.removeVassal(this));
 
         removeAllLandmark(); //Remove all Landmark from the deleted town
         removeAllProperty(); //Remove all Property from the deleted town

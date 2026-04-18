@@ -96,6 +96,8 @@ boundaryParticles :
 
 #Enable Nations
 EnableNation: true
+#If false, normal users cannot create nations. Admins with "tan.admin.commands" can still create them.
+AllowPlayerCreateNation: true
 
 nationCost: 25000
 

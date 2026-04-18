@@ -5,7 +5,6 @@ import org.leralix.tan.data.upgrade.rewards.IndividualStat;
 import org.leralix.tan.data.upgrade.rewards.StatsType;
 import org.leralix.tan.data.upgrade.rewards.bool.EnableMobBan;
 import org.leralix.tan.data.upgrade.rewards.bool.EnableTownSpawn;
-import org.leralix.tan.data.upgrade.rewards.list.BiomeStat;
 import org.leralix.tan.data.upgrade.rewards.list.PermissionList;
 import org.leralix.tan.data.upgrade.rewards.numeric.*;
 import org.leralix.tan.data.upgrade.rewards.percentage.LandmarkBonus;
@@ -96,7 +95,6 @@ public class TerritoryStats {
             allStats.add(getStat(EnableMobBan.class));
         }
         allStats.add(getStat(PermissionList.class));
-        allStats.add(getStat(BiomeStat.class));
         return allStats;
     }
 

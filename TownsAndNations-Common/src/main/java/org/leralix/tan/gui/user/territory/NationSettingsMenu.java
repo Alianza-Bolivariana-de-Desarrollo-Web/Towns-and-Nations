@@ -70,7 +70,7 @@ public class NationSettingsMenu extends SettingsMenus {
 
     private @NotNull GuiItem getChangeCapitalButton() {
         Territory capital = nationData.getCapital();
-        String capitalName = capital == null ? Lang.NO_REGION.get(tanPlayer) : capital.getName();
+        String capitalName = capital == null ? Lang.NO_TOWN.get(tanPlayer) : capital.getName();
 
         return iconManager.get(IconKey.NATION_CHANGE_CAPITAL_ICON)
                 .setName(Lang.GUI_NATION_CHANGE_CAPITAL.get(tanPlayer))

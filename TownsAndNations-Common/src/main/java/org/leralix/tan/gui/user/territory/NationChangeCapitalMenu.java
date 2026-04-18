@@ -3,8 +3,8 @@ package org.leralix.tan.gui.user.territory;
 import dev.triumphteam.gui.guis.GuiItem;
 import org.bukkit.entity.Player;
 import org.leralix.tan.data.territory.Nation;
-import org.leralix.tan.data.territory.Region;
 import org.leralix.tan.data.territory.Territory;
+import org.leralix.tan.data.territory.Town;
 import org.leralix.tan.gui.IteratorGUI;
 import org.leralix.tan.gui.common.ConfirmMenu;
 import org.leralix.tan.lang.Lang;
@@ -32,20 +32,20 @@ public class NationChangeCapitalMenu extends IteratorGUI {
         ArrayList<GuiItem> guiItems = new ArrayList<>();
 
         for (Territory territory : nationData.getVassalsInternal()) {
-            if (!(territory instanceof Region regionData)) {
+            if (!(territory instanceof Town townData)) {
                 continue;
             }
 
             guiItems.add(
-                    regionData.getIconWithInformations(tanPlayer.getLang())
+                    townData.getIconWithInformations(tanPlayer.getLang())
                             .setAction(action -> {
                                 action.setCancelled(true);
 
                                 new ConfirmMenu(
                                         player,
-                                        Lang.GUI_CONFIRM_CHANGE_NATION_CAPITAL.get(regionData.getName()),
+                                        Lang.GUI_CONFIRM_CHANGE_NATION_CAPITAL.get(townData.getName()),
                                         () -> {
-                                            nationData.setCapital(regionData.getID());
+                                            nationData.setCapital(townData.getID());
                                             new NationSettingsMenu(player, nationData, this);
                                         },
                                         this::open

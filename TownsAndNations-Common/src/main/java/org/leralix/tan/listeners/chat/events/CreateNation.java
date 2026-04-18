@@ -27,7 +27,7 @@ public class CreateNation extends ChatListenerEvent {
     @Override
     public boolean execute(Player player, ITanPlayer tanPlayer, String message) {
 
-        if (!player.hasPermission("tan.base.nation.create")) {
+        if (!canCreateNation(player)) {
             TanChatUtils.message(player, Lang.PLAYER_NO_PERMISSION.get(tanPlayer));
             return false;
         }
@@ -72,6 +72,16 @@ public class CreateNation extends ChatListenerEvent {
 
         createNation(player, tanPlayer, nationName, capital);
         return true;
+    }
+
+    private boolean canCreateNation(Player player) {
+        if (player.hasPermission("tan.admin.commands")) {
+            return true;
+        }
+        if (!Constants.allowPlayerCreateNation()) {
+            return false;
+        }
+        return player.hasPermission("tan.base.nation.create");
     }
 
     public void createNation(Player player, ITanPlayer playerData, String nationName, Town capital) {

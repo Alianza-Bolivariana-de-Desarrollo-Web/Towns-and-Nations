@@ -91,7 +91,6 @@ upgrades:
       CHUNK_CAP: +50
       CHUNK_COST: 1
       CHUNK_UPKEEP_COST: 0.05
-      AUTHORIZED_BIOMES: [ 'All' ]
 
   # ===== COLUMN 0 =====
 

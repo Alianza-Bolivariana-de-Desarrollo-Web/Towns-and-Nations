@@ -132,7 +132,7 @@ public class NationData extends TerritoryData implements Nation, TanNation {
     @Override
     public IconBuilder getIconWithInformations(LangType langType) {
         Territory capital = getCapital();
-        String capitalName = capital == null ? Lang.NO_REGION.get(langType) : capital.getName();
+        String capitalName = capital == null ? Lang.NO_TOWN.get(langType) : capital.getName();
         return IconManager.getInstance().get(getIcon())
                 .setName(ChatColor.GOLD + getName())
                 .setDescription(
@@ -254,22 +254,22 @@ public class NationData extends TerritoryData implements Nation, TanNation {
 
     @Override
     protected void collectTaxes() {
-        for (Territory region : getVassalsInternal()) {
-            if (region == null) {
+        for (Territory town : getVassalsInternal()) {
+            if (town == null) {
                 continue;
             }
 
             double tax = getTax();
-            double currentBalance = region.getBalance();
+            double currentBalance = town.getBalance();
 
             if (currentBalance < tax) {
                 addToBalance(currentBalance);
-                region.removeFromBalance(currentBalance);
-                TransactionManager.getInstance().register(new TerritoryTaxTransaction(region.getID(), this.getID(), currentBalance, false));
+                town.removeFromBalance(currentBalance);
+                TransactionManager.getInstance().register(new TerritoryTaxTransaction(town.getID(), this.getID(), currentBalance, false));
             } else {
-                region.removeFromBalance(tax);
+                town.removeFromBalance(tax);
                 addToBalance(tax);
-                TransactionManager.getInstance().register(new TerritoryTaxTransaction(region.getID(), this.getID(), tax, true));
+                TransactionManager.getInstance().register(new TerritoryTaxTransaction(town.getID(), this.getID(), tax, true));
             }
         }
     }

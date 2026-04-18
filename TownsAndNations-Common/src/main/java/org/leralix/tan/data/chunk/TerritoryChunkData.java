@@ -10,6 +10,7 @@ import org.leralix.lib.data.SoundEnum;
 import org.leralix.tan.TownsAndNations;
 import org.leralix.tan.data.building.property.PropertyData;
 import org.leralix.tan.data.player.ITanPlayer;
+import org.leralix.tan.data.territory.Nation;
 import org.leralix.tan.data.territory.Territory;
 import org.leralix.tan.data.territory.Town;
 import org.leralix.tan.data.territory.permission.ChunkPermission;
@@ -130,20 +131,26 @@ public abstract class TerritoryChunkData extends ChunkData implements TerritoryC
     @Override
     public TextComponent getMapIcon(LangType langType) {
 
+        Territory ownerTerritory = getOwnerInternal();
+        Territory occupierTerritory = getOccupierInternal();
+
         TextComponent textComponent;
         String text;
         if (isOccupied()) {
             textComponent = new TextComponent("🟧");
-            textComponent.setColor(getOccupierInternal().getChunkColor());
+            textComponent.setColor(occupierTerritory.getChunkColor());
             text = "x : " + super.getMiddleX() + " z : " + super.getMiddleZ() + "\n" +
-                    getOwner().getColoredName() + "\n" +
-                    getOccupier().getColoredName() + "\n" +
+                    ownerTerritory.getColoredName() + "\n" +
+                    getNationLineForHover(ownerTerritory, langType) +
+                    occupierTerritory.getColoredName() + "\n" +
+                    getNationLineForHover(occupierTerritory, langType) +
                     Lang.LEFT_CLICK_TO_CLAIM.get(langType);
         } else {
             textComponent = new TextComponent("⬛");
-            textComponent.setColor(getOccupierInternal().getChunkColor());
+            textComponent.setColor(ownerTerritory.getChunkColor());
             text = "x : " + super.getMiddleX() + " z : " + super.getMiddleZ() + "\n" +
-                    getOwner().getColoredName() + "\n" +
+                    ownerTerritory.getColoredName() + "\n" +
+                    getNationLineForHover(ownerTerritory, langType) +
                     Lang.LEFT_CLICK_TO_CLAIM.get(langType);
         }
 
@@ -151,6 +158,20 @@ public abstract class TerritoryChunkData extends ChunkData implements TerritoryC
                 HoverEvent.Action.SHOW_TEXT,
                 new Text(text)));
         return textComponent;
+    }
+
+    private String getNationLineForHover(Territory territory, LangType langType) {
+        if (!(territory instanceof Town ownerTown)) {
+            return "";
+        }
+
+        String nationName = Lang.NO_NATION.get(langType);
+        var optOverlord = ownerTown.getOverlordInternal();
+        if (optOverlord.isPresent() && optOverlord.get() instanceof Nation nation) {
+            nationName = nation.getColoredName();
+        }
+
+        return Lang.MAP_NATION.get(langType) + ": " + nationName + "\n";
     }
 
     /**
@@ -163,10 +184,12 @@ public abstract class TerritoryChunkData extends ChunkData implements TerritoryC
     public void unclaimChunk(Player player, ITanPlayer tanPlayer, LangType langType) {
 
         Territory ownerTerritory = getOwnerInternal();
+        boolean isAdmin = player.hasPermission("tan.admin.commands");
 
-        //If owner territory contains the player, regular check
-        if (ownerTerritory.isPlayerIn(player)) {
-            if (!ownerTerritory.checkPlayerPermission(tanPlayer, TerritoryPermission.UNCLAIM_CHUNK)) {
+        // If owner territory contains the player, regular check.
+        // Admin can bypass ownership checks.
+        if (ownerTerritory.isPlayerIn(player) || isAdmin) {
+            if (!isAdmin && !ownerTerritory.checkPlayerPermission(tanPlayer, TerritoryPermission.UNCLAIM_CHUNK)) {
                 TanChatUtils.message(player, Lang.PLAYER_NO_PERMISSION.get(langType), SoundEnum.NOT_ALLOWED);
                 return;
             }
@@ -209,30 +232,6 @@ public abstract class TerritoryChunkData extends ChunkData implements TerritoryC
                 TanChatUtils.message(player, Lang.CHUNK_UNCLAIMED_SUCCESS_LIMITED.get(ownerTerritory.getColoredName(), currentChunks, maxChunks));
             }
         } else {
-            // Special case: one of the player's territories can conquer chunks due to a past war.
-            for (Territory territoryData : tanPlayer.getAllTerritoriesPlayerIsIn()) {
-                if (territoryData.canConquerChunk(this)) {
-
-                    if (isOccupied()) {
-                        TanChatUtils.message(player, Lang.CHUNK_OCCUPIED_CANT_UNCLAIM.get(langType));
-                        return;
-                    }
-
-                    if (Constants.preventOrphanChunks() &&
-                            !Constants.allowNonAdjacentChunksFor(ownerTerritory) &&
-                            ChunkUtil.doesUnclaimCauseOrphan(this)
-                    ) {
-                        TanChatUtils.message(player, Lang.CANNOT_UNCLAIM_BECAUSE_CREATE_ORPHAN.get(langType));
-                        return;
-                    }
-
-
-                    TownsAndNations.getPlugin().getClaimStorage().unclaimChunkAndUpdate(this);
-                    TanChatUtils.message(player, Lang.CHUNK_UNCLAIMED_SUCCESS_UNLIMITED.get(langType, ownerTerritory.getColoredName()), SoundEnum.MINOR_GOOD);
-                    return;
-                }
-            }
-            // Player is not part of territory
             TanChatUtils.message(player, Lang.PLAYER_NOT_IN_TERRITORY.get(langType, ownerTerritory.getColoredName()));
         }
     }
@@ -313,6 +312,14 @@ public abstract class TerritoryChunkData extends ChunkData implements TerritoryC
         }
 
         Territory territoryOfChunk = getOwnerInternal();
+        Territory permissionTerritory = territoryOfChunk;
+        if (permissionType != ChunkPermissionType.INTERACT_CHEST && territoryOfChunk instanceof Town ownerTown) {
+            var optOverlord = ownerTown.getOverlordInternal();
+            if (optOverlord.isPresent() && optOverlord.get() instanceof Nation nation) {
+                permissionTerritory = nation;
+            }
+        }
+
         //Player is at war with the town
         for (CurrentAttack currentAttacks : territoryOfChunk.getCurrentAttacks()) {
             if (currentAttacks.containsPlayer(tanPlayer))
@@ -320,15 +327,15 @@ public abstract class TerritoryChunkData extends ChunkData implements TerritoryC
         }
 
         //If the permission is locked by admins, only shows default value.
-        var defaultPermission = (territoryOfChunk instanceof Town)
+        var defaultPermission = (permissionTerritory instanceof Town)
                 ? Constants.getChunkPermissionConfig().getTownPermission(permissionType)
                 : Constants.getChunkPermissionConfig().getRegionPermission(permissionType);
         if (defaultPermission.isLocked()) {
-            return defaultPermission.defaultRelation().isAllowed(territoryOfChunk, tanPlayer);
+            return defaultPermission.defaultRelation().isAllowed(permissionTerritory, tanPlayer);
         }
 
-        ChunkPermission chunkPermission = territoryOfChunk.getChunkSettings().getChunkPermissions().get(permissionType);
-        if (chunkPermission.isAllowed(territoryOfChunk, tanPlayer))
+        ChunkPermission chunkPermission = permissionTerritory.getChunkSettings().getChunkPermissions().get(permissionType);
+        if (chunkPermission.isAllowed(permissionTerritory, tanPlayer))
             return true;
 
         playerCantPerformAction(player, tanPlayer.getLang());
@@ -342,3 +349,6 @@ public abstract class TerritoryChunkData extends ChunkData implements TerritoryC
         }
     }
 }
+
+
+

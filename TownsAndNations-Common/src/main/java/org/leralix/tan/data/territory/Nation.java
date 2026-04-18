@@ -4,5 +4,5 @@ import org.tan.api.interfaces.territory.TanNation;
 
 public interface Nation extends Territory, TanNation {
 
-    void setCapital(String regionID);
+    void setCapital(String townID);
 }

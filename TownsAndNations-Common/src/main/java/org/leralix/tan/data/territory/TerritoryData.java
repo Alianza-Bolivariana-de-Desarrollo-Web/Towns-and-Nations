@@ -38,7 +38,6 @@ import org.leralix.tan.data.territory.relation.TownRelation;
 import org.leralix.tan.data.territory.teleportation.TeleportationData;
 import org.leralix.tan.data.upgrade.TerritoryStats;
 import org.leralix.tan.data.upgrade.rewards.StatsType;
-import org.leralix.tan.data.upgrade.rewards.list.BiomeStat;
 import org.leralix.tan.data.upgrade.rewards.numeric.ChunkCap;
 import org.leralix.tan.data.upgrade.rewards.numeric.ChunkCost;
 import org.leralix.tan.data.upgrade.rewards.numeric.ChunkUpkeepCost;
@@ -442,10 +441,10 @@ public abstract class TerritoryData implements TanTerritory, Territory {
     public void addVassal(Territory vassal) {
         EventManager.getInstance().callEvent(new TerritoryVassalAcceptedInternalEvent(vassal, this));
 
-        RankData regionDefaultRank = getDefaultRank();
+        RankData overlordDefaultRank = getDefaultRank();
         for(ITanPlayer player : vassal.getITanPlayerList()){
-            player.setRegionRankID(regionDefaultRank.getID());
-            regionDefaultRank.addPlayer(player);
+            player.setRankID(this, overlordDefaultRank.getID());
+            overlordDefaultRank.addPlayer(player);
         }
 
         addVassalPrivate(vassal);
@@ -558,11 +557,6 @@ public abstract class TerritoryData implements TanTerritory, Territory {
 
         TerritoryStats territoryStats = getNewLevel();
         int nbOfClaimedChunks = getNumberOfClaimedChunk();
-
-        if (!territoryStats.getStat(BiomeStat.class).canClaimBiome(chunk)) {
-            TanChatUtils.message(player, Lang.CHUNK_BIOME_NOT_ALLOWED.get(tanPlayer.getLang()));
-            return false;
-        }
 
         if (!territoryStats.getStat(ChunkCap.class).canDoAction(nbOfClaimedChunks)) {
             TanChatUtils.message(player, Lang.MAX_CHUNK_LIMIT_REACHED.get(tanPlayer.getLang()));

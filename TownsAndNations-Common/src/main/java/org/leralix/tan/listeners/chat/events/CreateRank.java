@@ -3,6 +3,7 @@ package org.leralix.tan.listeners.chat.events;
 import org.bukkit.entity.Player;
 import org.leralix.tan.data.player.ITanPlayer;
 import org.leralix.tan.data.territory.Territory;
+import org.leralix.tan.data.territory.Town;
 import org.leralix.tan.lang.Lang;
 import org.leralix.tan.listeners.chat.ChatListenerEvent;
 import org.leralix.tan.utils.constants.Constants;
@@ -22,6 +23,12 @@ public class CreateRank extends ChatListenerEvent {
 
     @Override
     public boolean execute(Player player, ITanPlayer playerData, String message) {
+        if (territoryData instanceof Town) {
+            TanChatUtils.message(player, Lang.PLAYER_NO_PERMISSION.get(playerData));
+            openGui(guiCallback, player);
+            return true;
+        }
+
         String rankName = message == null ? "" : message.trim();
         int maxNameSize = Constants.getRankNameSize();
 

@@ -7,6 +7,7 @@ import org.bukkit.inventory.ItemStack;
 import org.leralix.lib.utils.SoundUtil;
 import org.leralix.tan.data.player.ITanPlayer;
 import org.leralix.tan.data.territory.Territory;
+import org.leralix.tan.data.territory.Town;
 import org.leralix.tan.data.territory.rank.RankData;
 import org.leralix.tan.data.territory.rank.RankEnum;
 import org.leralix.tan.gui.BasicGui;
@@ -84,6 +85,10 @@ public class RankManagerMenu extends BasicGui {
                 .setName(Lang.GUI_TOWN_MEMBERS_ROLE_DELETE.get(tanPlayer))
                 .setClickToAcceptMessage(Lang.GUI_GENERIC_CLICK_TO_PROCEED)
                 .setAction(event -> {
+                    if (territoryData instanceof Town) {
+                        TanChatUtils.message(player, Lang.PLAYER_NO_PERMISSION.get(tanPlayer), NOT_ALLOWED);
+                        return;
+                    }
                     if(!isEmpty){
                         TanChatUtils.message(player, Lang.GUI_TOWN_MEMBERS_ROLE_DELETE_ERROR_NOT_EMPTY.get(tanPlayer), NOT_ALLOWED);
                         return;

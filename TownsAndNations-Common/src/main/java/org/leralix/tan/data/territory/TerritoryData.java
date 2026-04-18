@@ -735,6 +735,10 @@ public abstract class TerritoryData implements TanTerritory, Territory {
 
     @Override
     public RankData registerNewRank(String rankName) {
+        if (this instanceof Town && getRanks().size() >= 2) {
+            return getDefaultRank();
+        }
+
         int nextRankId = 0;
         for (RankData rank : getAllRanks()) {
             if (rank.getID() >= nextRankId) nextRankId = rank.getID() + 1;
@@ -747,6 +751,9 @@ public abstract class TerritoryData implements TanTerritory, Territory {
 
     @Override
     public void removeRank(int key) {
+        if (this instanceof Town) {
+            return;
+        }
         getRanks().remove(key);
     }
 

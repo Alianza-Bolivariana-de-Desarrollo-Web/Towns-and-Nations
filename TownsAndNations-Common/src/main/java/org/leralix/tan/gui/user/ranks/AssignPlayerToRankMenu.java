@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.leralix.tan.TownsAndNations;
 import org.leralix.tan.data.player.ITanPlayer;
 import org.leralix.tan.data.territory.Territory;
+import org.leralix.tan.data.territory.Town;
 import org.leralix.tan.data.territory.rank.RankData;
 import org.leralix.tan.gui.IteratorGUI;
 import org.leralix.tan.lang.Lang;
@@ -55,6 +56,15 @@ public class AssignPlayerToRankMenu extends IteratorGUI {
                         if(territoryData.getRank(tanPlayer).getLevel() <= otherPlayerActualRank.getLevel() && !territoryData.isLeader(tanPlayer)){
                             TanChatUtils.message(player, Lang.PLAYER_NO_PERMISSION_RANK_DIFFERENCE.get(tanPlayer));
                             return;
+                        }
+
+                        if (territoryData instanceof Town townData) {
+                            boolean assigningMayorRank = "alcalde".equalsIgnoreCase(rankData.getName());
+                            boolean targetIsLeader = townData.isLeader(otherPlayerUUID);
+                            if ((assigningMayorRank && !targetIsLeader) || (!assigningMayorRank && targetIsLeader)) {
+                                TanChatUtils.message(player, Lang.PLAYER_NO_PERMISSION.get(tanPlayer));
+                                return;
+                            }
                         }
 
                         ITanPlayer playerStat = TownsAndNations.getPlugin().getPlayerDataStorage().get(otherPlayerUUID);

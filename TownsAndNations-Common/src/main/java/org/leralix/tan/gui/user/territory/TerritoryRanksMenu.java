@@ -3,6 +3,7 @@ package org.leralix.tan.gui.user.territory;
 import dev.triumphteam.gui.guis.GuiItem;
 import org.bukkit.entity.Player;
 import org.leralix.tan.data.territory.Territory;
+import org.leralix.tan.data.territory.Town;
 import org.leralix.tan.data.territory.rank.RankData;
 import org.leralix.tan.data.territory.rank.RolePermission;
 import org.leralix.tan.gui.IteratorGUI;
@@ -33,7 +34,9 @@ public class TerritoryRanksMenu extends IteratorGUI {
 
         iterator(getRanks(),  p -> territoryData.openMainMenu(player, tanPlayer));
 
-        gui.setItem(4, 5, getCreateNewRoleButton());
+        if (!(territoryData instanceof Town)) {
+            gui.setItem(4, 5, getCreateNewRoleButton());
+        }
 
         gui.open(player);
     }

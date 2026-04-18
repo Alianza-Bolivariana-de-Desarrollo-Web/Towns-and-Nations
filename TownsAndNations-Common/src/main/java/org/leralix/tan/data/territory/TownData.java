@@ -49,6 +49,7 @@ public class TownData extends TerritoryData implements Town {
     private Map<String, PropertyData> propertyDataMap;
     private final Set<UUID> townPlayerListId;
     private Vector2D capitalLocation;
+    private transient boolean normalizingRanks;
 
 
     public TownData(String townId, String townName) {
@@ -71,6 +72,109 @@ public class TownData extends TerritoryData implements Town {
         this.townTag = prefixSizeRange.isValueIn(townName.length()) ?
                 townName.toUpperCase() :
                 townName.substring(0, prefixSizeRange.getMaxVal()).toUpperCase();
+
+        normalizeTownRanks();
+    }
+
+    @Override
+    public Map<Integer, RankData> getRanks() {
+        Map<Integer, RankData> ranks = super.getRanks();
+        normalizeTownRanks();
+        return ranks;
+    }
+
+    private void normalizeTownRanks() {
+        if (normalizingRanks) {
+            return;
+        }
+        normalizingRanks = true;
+        try {
+            Map<Integer, RankData> rankMap = super.getRanks();
+            if (rankMap.isEmpty()) {
+                return;
+            }
+
+            RankData citizenRank = findRankByName(rankMap, "ciudadano");
+            RankData mayorRank = findRankByName(rankMap, "alcalde");
+
+            if (citizenRank == null) {
+                citizenRank = getRank(getDefaultRankID());
+                if (citizenRank == null) {
+                    citizenRank = createRankDirect(rankMap, "ciudadano");
+                } else {
+                    citizenRank.setName("ciudadano");
+                }
+            }
+            setDefaultRank(citizenRank.getID());
+
+            if (mayorRank == null) {
+                mayorRank = createRankDirect(rankMap, "alcalde");
+            }
+
+            Set<Integer> allowedIds = Set.of(citizenRank.getID(), mayorRank.getID());
+            List<RankData> extraRanks = new ArrayList<>();
+            for (RankData rankData : new ArrayList<>(rankMap.values())) {
+                if (!allowedIds.contains(rankData.getID())) {
+                    extraRanks.add(rankData);
+                }
+            }
+
+            for (RankData extraRank : extraRanks) {
+                for (UUID playerId : new ArrayList<>(extraRank.getPlayersID())) {
+                    if (!citizenRank.getPlayersID().contains(playerId)) {
+                        citizenRank.addPlayer(playerId);
+                    }
+                    ITanPlayer tanPlayer = TownsAndNations.getPlugin().getPlayerDataStorage().get(playerId);
+                    tanPlayer.setTownRankID(citizenRank.getID());
+                }
+                rankMap.remove(extraRank.getID());
+            }
+
+            if (UuidLeader != null && townPlayerListId.contains(UuidLeader)) {
+                for (RankData rank : rankMap.values()) {
+                    rank.removePlayer(UuidLeader);
+                }
+                mayorRank.addPlayer(UuidLeader);
+                TownsAndNations.getPlugin().getPlayerDataStorage().get(UuidLeader).setTownRankID(mayorRank.getID());
+            }
+
+            for (UUID playerId : townPlayerListId) {
+                if (UuidLeader != null && UuidLeader.equals(playerId)) {
+                    continue;
+                }
+                ITanPlayer tanPlayer = TownsAndNations.getPlugin().getPlayerDataStorage().get(playerId);
+                Integer rankId = tanPlayer.getTownRankID();
+                if (rankId == null || !rankMap.containsKey(rankId)) {
+                    tanPlayer.setTownRankID(citizenRank.getID());
+                    if (!citizenRank.getPlayersID().contains(playerId)) {
+                        citizenRank.addPlayer(playerId);
+                    }
+                }
+            }
+        } finally {
+            normalizingRanks = false;
+        }
+    }
+
+    private RankData findRankByName(Map<Integer, RankData> rankMap, String name) {
+        for (RankData rankData : rankMap.values()) {
+            if (rankData.getName() != null && rankData.getName().equalsIgnoreCase(name)) {
+                return rankData;
+            }
+        }
+        return null;
+    }
+
+    private RankData createRankDirect(Map<Integer, RankData> rankMap, String name) {
+        int nextRankId = 0;
+        for (RankData rankData : rankMap.values()) {
+            if (rankData.getID() >= nextRankId) {
+                nextRankId = rankData.getID() + 1;
+            }
+        }
+        RankData newRank = new RankData(nextRankId, name);
+        rankMap.put(nextRankId, newRank);
+        return newRank;
     }
 
     @Override
@@ -175,6 +279,7 @@ public class TownData extends TerritoryData implements Town {
     @Override
     public void setLeaderID(UUID leaderID) {
         this.UuidLeader = leaderID;
+        normalizeTownRanks();
     }
 
 
@@ -393,6 +498,32 @@ public class TownData extends TerritoryData implements Town {
     @Override
     protected void specificSetPlayerRank(ITanPlayer tanPlayer, int rankID) {
         tanPlayer.setTownRankID(rankID);
+    }
+
+    @Override
+    public void setPlayerRank(ITanPlayer playerStat, RankData rankData) {
+        normalizeTownRanks();
+
+        RankData mayorRank = findRankByName(super.getRanks(), "alcalde");
+        RankData citizenRank = findRankByName(super.getRanks(), "ciudadano");
+        if (citizenRank == null) {
+            citizenRank = getDefaultRank();
+        }
+
+        RankData targetRank = rankData;
+        if (targetRank == null || !super.getRanks().containsKey(targetRank.getID())) {
+            targetRank = citizenRank;
+        }
+
+        if (mayorRank != null) {
+            if (isLeader(playerStat.getID())) {
+                targetRank = mayorRank;
+            } else if (Objects.equals(targetRank.getID(), mayorRank.getID())) {
+                targetRank = citizenRank;
+            }
+        }
+
+        super.setPlayerRank(playerStat, targetRank);
     }
 
     @Override

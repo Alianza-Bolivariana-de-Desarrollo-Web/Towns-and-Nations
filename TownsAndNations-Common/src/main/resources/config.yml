@@ -142,7 +142,7 @@ notifyEnemyEnterRegion: true
 ########################
 
 #The cost of creating a town
-townCost: 1000
+townCost: 3000
 
 #The max size of names
 RegionNameSize: 45
